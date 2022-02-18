@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { MdClear, MdImage, MdShuffle } from "react-icons/md";
 import "./App.module.scss";
 import { Pokemon } from "./components/Pokemon";
 import { Box } from "./components/ui/Box";
@@ -7,7 +8,7 @@ import { Error } from "./components/ui/Error";
 import { Margin } from "./components/ui/Margin";
 import { TextArea } from "./components/ui/TextArea";
 import { Title } from "./components/ui/Title";
-import { getPokemonDetails, PokemonData } from "./utils/utils";
+import { getPokemonDetails, PokemonData, shuffleArray } from "./utils/utils";
 
 export function App() {
 	const [pokemonNames, setPokemonNames] = useState<string>(
@@ -49,6 +50,10 @@ export function App() {
 		setUnknownNames([]);
 	};
 
+	const onShuffle = () => {
+		setPokemons(shuffleArray(pokemons));
+	};
+
 	return (
 		<>
 			<Box>
@@ -58,8 +63,12 @@ export function App() {
 				<Margin margin={8} />
 				<p>It'll remember the list when you refresh the page</p>
 				<Margin margin={16} />
-				<Button onClick={onSubmit}>Turn into images!</Button>
+				<Button onClick={onSubmit}>
+					<MdImage />
+					Turn into images!
+				</Button>
 				<Button gray style={{ marginLeft: "12px" }} onClick={onClear}>
+					<MdClear />
 					Clear images (not list)
 				</Button>
 				{unknownNames.length == 0 ? <></> : <Margin margin={16} />}
@@ -71,7 +80,19 @@ export function App() {
 						is unknown or spelled wrong!
 					</Error>
 				))}
+				{pokemons.length == 0 ? (
+					<></>
+				) : (
+					<div>
+						<Margin margin={16} />
+						<Button onClick={onShuffle} gray>
+							<MdShuffle />
+							Shuffle images
+						</Button>
+					</div>
+				)}
 			</Box>
+
 			<div>
 				{pokemons.map(pokemon => (
 					<Pokemon key={String(pokemon.id)} pokemon={pokemon} />
