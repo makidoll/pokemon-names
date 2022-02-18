@@ -10,7 +10,7 @@ export function TextArea(props: {
 		<textarea
 			style={props.style}
 			className={classes.textarea}
-			cols={40}
+			cols={18}
 			rows={10}
 			onInput={e => {
 				props.onInput(e.currentTarget.value);
