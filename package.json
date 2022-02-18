@@ -3,7 +3,7 @@
 	"private": true,
 	"scripts": {
 		"start": "parcel serve src/index.html",
-		"build": "parcel build src/index.html"
+		"build": "parcel build src/index.html --public-url /pokemon-names/"
 	},
 	"dependencies": {
 		"react": "^17.0.2",
