@@ -1,3 +1,5 @@
+import domToImage from "dom-to-image";
+
 export function classNames(names: any[]) {
 	return names.filter(name => name != null).join(" ");
 }
@@ -88,4 +90,50 @@ export function shuffleArray<T>(inputArray: T[]): T[] {
 		[array[i], array[j]] = [array[j], array[i]];
 	}
 	return array;
+}
+
+export function downloadDataUri(dataUri: string, filename: string) {
+	const link = document.createElement("a");
+	link.download = filename;
+	link.href = dataUri;
+	document.body.appendChild(link);
+	link.click();
+	// document.body.removeChild(link);
+	link.remove();
+}
+
+export function makeImage(dataUri: string): Promise<HTMLImageElement> {
+	return new Promise((resolve, reject) => {
+		const image = new Image();
+		image.onload = function () {
+			resolve(image);
+		};
+		image.onerror = reject;
+		image.src = dataUri;
+	});
+}
+
+export async function svgToPng(svgDataUri: string, scale = 1) {
+	const svgImage = await makeImage(svgDataUri);
+
+	const canvas = document.createElement("canvas");
+	canvas.width = svgImage.width * scale;
+	canvas.height = svgImage.height * scale;
+
+	const ctx = canvas.getContext("2d");
+	ctx.fillStyle = "#fff";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.drawImage(
+		svgImage,
+		0,
+		0,
+		svgImage.width,
+		svgImage.height,
+		0,
+		0,
+		svgImage.width * scale,
+		svgImage.height * scale,
+	);
+
+	return canvas.toDataURL();
 }

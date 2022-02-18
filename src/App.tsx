@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MdClear, MdImage, MdShuffle } from "react-icons/md";
+import { MdClear, MdImage, MdSave, MdShuffle } from "react-icons/md";
 import "./App.module.scss";
 import { Pokemon } from "./components/Pokemon";
 import { Box } from "./components/ui/Box";
@@ -8,7 +8,15 @@ import { Error } from "./components/ui/Error";
 import { Margin } from "./components/ui/Margin";
 import { TextArea } from "./components/ui/TextArea";
 import { Title } from "./components/ui/Title";
-import { getPokemonDetails, PokemonData, shuffleArray } from "./utils/utils";
+import {
+	downloadDataUri,
+	getPokemonDetails,
+	PokemonData,
+	shuffleArray,
+	svgToPng,
+} from "./utils/utils";
+import domToImage from "dom-to-image";
+import { TextInput } from "./components/ui/TextInput";
 
 export function App() {
 	const [pokemonNames, setPokemonNames] = useState<string>(
@@ -18,6 +26,11 @@ export function App() {
 	const [pokemons, setPokemons] = useState<PokemonData[]>([]);
 
 	const [unknownNames, setUnknownNames] = useState<string[]>([]);
+
+	const defaultSavingItemsPerRow = 12;
+	const [savingItemsPerRow, setSavingItemsPerRow] = useState<number>(
+		defaultSavingItemsPerRow,
+	);
 
 	const onInput = (text: string) => {
 		setPokemonNames(text);
@@ -54,24 +67,53 @@ export function App() {
 		setPokemons(shuffleArray(pokemons));
 	};
 
+	const onSaveAsImage = async () => {
+		const itemsInRow =
+			savingItemsPerRow <= 0
+				? defaultSavingItemsPerRow
+				: savingItemsPerRow;
+		setSavingItemsPerRow(itemsInRow);
+
+		const cardMargin = 16;
+		const card = document.querySelector("#pokemons > div");
+
+		const cardWidth = card.clientWidth + cardMargin * 2;
+		const cardHeight = card.clientHeight + cardMargin * 2;
+
+		const svg = await domToImage.toSvg(
+			document.getElementById("pokemons"),
+			{
+				width: cardWidth * itemsInRow,
+				height: cardHeight * Math.ceil(pokemons.length / itemsInRow),
+			},
+		);
+
+		const png = await svgToPng(svg, 2);
+
+		downloadDataUri(png, "pokemons.png");
+	};
+
 	return (
 		<>
 			<Box>
 				<Title size={1.5}>List Pokémon names and get images!</Title>
-				<Margin margin={16} />
+				<Margin v={16} />
 				<TextArea onInput={onInput} value={pokemonNames} />
-				<Margin margin={8} />
-				<p>It'll remember the list when you refresh the page</p>
-				<Margin margin={16} />
+				<Margin v={8} />
+				<p style={{ opacity: 0.5, marginLeft: 8 }}>
+					It'll remember the list when you refresh the page
+				</p>
+				<Margin v={16} />
 				<Button onClick={onSubmit}>
 					<MdImage />
 					Turn into images!
 				</Button>
-				<Button gray style={{ marginLeft: "12px" }} onClick={onClear}>
+				<Margin h={16} />
+				<Button gray onClick={onClear}>
 					<MdClear />
 					Clear images (not list)
 				</Button>
-				{unknownNames.length == 0 ? <></> : <Margin margin={16} />}
+				{unknownNames.length == 0 ? <></> : <Margin v={16} />}
 				{unknownNames.map((name, i) => (
 					<Error key={i}>
 						<b style={{ textTransform: "capitalize" }}>
@@ -80,20 +122,69 @@ export function App() {
 						is unknown or spelled wrong!
 					</Error>
 				))}
-				{pokemons.length == 0 ? (
-					<></>
-				) : (
-					<div>
-						<Margin margin={16} />
-						<Button onClick={onShuffle} gray>
-							<MdShuffle />
-							Shuffle images
-						</Button>
-					</div>
-				)}
 			</Box>
-
-			<div>
+			{pokemons.length == 0 ? (
+				<></>
+			) : (
+				<div
+					style={{
+						margin: "16px",
+						display: "flex",
+						alignItems: "center",
+					}}
+				>
+					<Margin v={16} />
+					<Button onClick={onShuffle} gray>
+						<MdShuffle />
+						Shuffle images
+					</Button>
+					<Margin h={32} />
+					<div
+						style={{
+							borderLeft: "solid 1px rgba(0,0,0,0.2)",
+							height: "48px",
+						}}
+					></div>
+					<Margin h={32} />
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center",
+						}}
+					>
+						<Button onClick={onSaveAsImage} gray>
+							<MdSave />
+							Download as big image
+						</Button>
+						<Margin v={8} />
+						<p style={{ opacity: 0.5 }}>
+							Might take a couple seconds
+						</p>
+					</div>
+					<Margin h={32} />
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center",
+						}}
+					>
+						<p>Items per row</p>
+						<Margin v={8} />
+						<TextInput
+							placeholder={String(defaultSavingItemsPerRow)}
+							type="number"
+							style={{ width: "80px" }}
+							onInput={n => {
+								setSavingItemsPerRow(Number(n));
+							}}
+							value={String(savingItemsPerRow)}
+						/>
+					</div>
+				</div>
+			)}
+			<div id="pokemons">
 				{pokemons.map(pokemon => (
 					<Pokemon key={String(pokemon.id)} pokemon={pokemon} />
 				))}

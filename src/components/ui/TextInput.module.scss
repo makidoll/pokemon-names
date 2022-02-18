@@ -1,0 +1,9 @@
+@import "../../utils/utils.scss";
+
+.input {
+	@include shadow;
+	border: none;
+	padding: 8px 16px;
+	border-radius: 16px;
+	width: 220px;
+}
