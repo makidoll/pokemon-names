@@ -1,0 +1,284 @@
+<html>
+	<head>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			* {
+				margin: 0;
+			}
+
+			body {
+				margin: 0;
+				margin: 8px;
+				font-family: "Varela Round", sans-serif;
+			}
+			textarea,
+			button {
+				font-family: "Varela Round", sans-serif;
+				font-size: 1rem;
+			}
+
+			h1 {
+				text-align: center;
+				margin-top: 32px;
+				margin-bottom: 16px;
+				font-size: 3em;
+			}
+
+			#header {
+				margin: 16px;
+				box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+				padding: 32px;
+				border-radius: 16px;
+				display: inline-block;
+			}
+
+			#header #input {
+				border-radius: 16px;
+				box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+				border: none;
+				padding: 8px 12px;
+			}
+
+			#header button {
+				border-radius: 16px;
+				box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+				border: none;
+				background: #e91e63;
+				display: block;
+				color: #fff;
+				padding: 8px 16px;
+				font-weight: bold;
+				cursor: pointer;
+				display: inline-block;
+			}
+
+			#header button.gray {
+				background: rgba(0, 0, 0, 0.4);
+				color: #fff;
+			}
+
+			#header #unknown {
+				margin-top: 24px;
+			}
+
+			#header #unknown div {
+				background-color: #f44336;
+				color: #fff;
+				box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+				border-radius: 16px;
+				padding: 8px 16px;
+				margin-top: 8px;
+			}
+
+			.pokemon {
+				width: 200px;
+				display: inline-block;
+				padding: 0 16px;
+				padding-bottom: 12px;
+				margin: 16px;
+				box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+				border-radius: 16px;
+			}
+
+			.pokemon img {
+				width: 100%;
+				/* image-rendering: pixelated; */
+			}
+
+			.pokemon h2 {
+				text-align: center;
+				margin-bottom: -4px;
+			}
+
+			.pokemon .info {
+				display: flex;
+				align-items: center;
+				/* justify-content: space-around; */
+				justify-content: center;
+				width: 100%;
+				margin: 6px 0;
+			}
+
+			.pokemon .types {
+				display: flex;
+				align-items: center;
+				/* justify-content: space-around; */
+				justify-content: center;
+				width: 100%;
+			}
+
+			.pokemon .types .type {
+				/* background-color: red; */
+				border-radius: 8px;
+				padding: 1px 8px;
+				color: #fff;
+				text-transform: capitalize;
+				margin: 0px 4px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="header">
+			<h2 style="margin-bottom: 16px">
+				List Pokémon names and get images!
+			</h2>
+			<textarea id="input" cols="40" rows="10"></textarea>
+			<p style="margin-top: 8px; margin-bottom: 16px">
+				It'll remember the list when you refresh the page
+			</p>
+			<button id="submit">Turn into images!</button>
+			<button id="clear" class="gray" style="margin-left: 8px">
+				Clear images
+			</button>
+			<div id="unknown" style="display: none"></div>
+		</div>
+		<div id="pokemons"></div>
+		<script>
+			const input = document.getElementById("input");
+			const submit = document.getElementById("submit");
+			const clear = document.getElementById("clear");
+			const unknown = document.getElementById("unknown");
+			const pokemons = document.getElementById("pokemons");
+
+			const typeColorMap = {
+				normal: "#A8A77A",
+				fire: "#EE8130",
+				water: "#6390F0",
+				electric: "#F7D02C",
+				grass: "#7AC74C",
+				ice: "#96D9D6",
+				fighting: "#C22E28",
+				poison: "#A33EA1",
+				ground: "#E2BF65",
+				flying: "#A98FF3",
+				psychic: "#F95587",
+				bug: "#A6B91A",
+				rock: "#B6A136",
+				ghost: "#735797",
+				dragon: "#6F35FC",
+				dark: "#705746",
+				steel: "#B7B7CE",
+				fairy: "#D685AD",
+			};
+
+			function weightToLbs(weight) {
+				const kg = weight / 10;
+				return kg * 2.20462262185;
+			}
+
+			function addPokemon(pokemon) {
+				const div = document.createElement("div");
+				div.className = "pokemon";
+				div.innerHTML = `
+					<img src="${pokemon.imageUrl}" alt="${pokemon.name}"/>
+					<h2>${pokemon.name}</h2>
+					<div class="info">
+						<p>${weightToLbs(pokemon.weight).toFixed(1)} lbs</p>
+					</div>
+					<div class="types">
+						${pokemon.types
+							.map(
+								type => `
+									<p class="type" style="background: ${typeColorMap[type]}">
+										${type}
+									</p>
+							`,
+							)
+							.join("")}
+					</div>
+				`;
+				pokemons.appendChild(div);
+			}
+
+			function updateUnknown(unknownPokemonNames) {
+				unknown.innerHTML = unknownPokemonNames
+					.map(
+						name =>
+							`<div><b>${name}</b> is unknown or spelled wrong!</div>`,
+					)
+					.join("");
+				unknown.style.display =
+					unknown.innerHTML.trim() == "" ? "none" : "block";
+			}
+
+			async function getPokemonDetails(name) {
+				const res = await fetch(
+					"https://pokeapi.co/api/v2/pokemon/" + name.toLowerCase(),
+				);
+				const data = await res.json();
+				return {
+					imageUrl:
+						data.sprites.other["official-artwork"].front_default,
+					// imageUrl: data.sprites.front_default,
+					weight: data.weight,
+					types: data.types.map(type => type.type.name),
+				};
+			}
+
+			async function pokemonNamesToUseful(stringList) {
+				const promises = stringList
+					.trim()
+					.split("\n")
+					.map(async name => {
+						const apiName = name
+							.trim()
+							.toLowerCase()
+							.replace(/ +/g, "-");
+
+						let data = null;
+						try {
+							data = await getPokemonDetails(apiName);
+						} catch (error) {
+							return { name: name.trim(), unknown: true };
+						}
+						const { imageUrl, weight, types } = data;
+
+						return {
+							name: name.trim(),
+							apiName,
+							imageUrl,
+							weight,
+							types,
+						};
+					});
+
+				return await Promise.all(promises);
+			}
+
+			input.addEventListener("input", () => {
+				localStorage.setItem("pokemonNames", input.value);
+			});
+
+			submit.addEventListener("click", async () => {
+				const pokemonNames = input.value;
+				localStorage.setItem("pokemonNames", input.value);
+
+				const useful = await pokemonNamesToUseful(pokemonNames);
+				pokemons.innerHTML = "";
+
+				let unknownNames = [];
+				for (const pokemon of useful) {
+					if (pokemon.unknown) {
+						unknownNames.push(pokemon.name);
+					} else {
+						addPokemon(pokemon);
+					}
+				}
+				updateUnknown(unknownNames);
+			});
+
+			clear.addEventListener("click", async () => {
+				pokemons.innerHTML = "";
+				updateUnknown([]);
+			});
+
+			const lastPokemonNames = localStorage.getItem("pokemonNames");
+			input.value = lastPokemonNames;
+		</script>
+	</body>
+</html>
