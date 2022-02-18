@@ -1,0 +1,10 @@
+@import "../../utils/utils.scss";
+
+.error {
+	@include shadow;
+	background-color: #f44336; // red 500
+	color: #fff;
+	border-radius: 16px;
+	padding: 8px 16px;
+	margin-top: 8px;
+}

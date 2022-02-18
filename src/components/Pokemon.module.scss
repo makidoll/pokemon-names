@@ -1,0 +1,35 @@
+.box {
+	padding: 0 16px;
+	width: 200px;
+}
+
+.image {
+	width: 100%;
+}
+
+.name {
+	text-transform: capitalize;
+	text-align: center;
+	margin-top: -5px;
+	margin-bottom: 2px;
+}
+
+.weight {
+	margin-bottom: 6px;
+}
+
+.types {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	margin-bottom: 12px;
+}
+
+.type {
+	border-radius: 8px;
+	padding: 1px 8px;
+	color: #fff;
+	text-transform: capitalize;
+	margin: 0px 4px;
+}

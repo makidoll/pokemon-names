@@ -1,0 +1,9 @@
+@import "../../utils/utils.scss";
+
+.box {
+	margin: 16px;
+	@include shadow;
+	padding: 32px;
+	border-radius: 16px;
+	display: inline-block;
+}

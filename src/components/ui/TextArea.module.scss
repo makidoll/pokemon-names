@@ -1,0 +1,9 @@
+@import "../../utils/utils.scss";
+
+.textarea {
+	border-radius: 16px;
+	@include shadow;
+	border: none;
+	padding: 8px 12px;
+	display: block;
+}

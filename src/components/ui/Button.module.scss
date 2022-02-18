@@ -1,0 +1,19 @@
+@import "../../utils/utils.scss";
+
+.button {
+	border-radius: 16px;
+	border: none;
+	background: #e91e63; // pink 500
+	display: block;
+	color: #fff;
+	padding: 8px 16px;
+	font-weight: bold;
+	cursor: pointer;
+	display: inline-block;
+	@include shadow;
+}
+
+.gray {
+	background: rgba(0, 0, 0, 0.4);
+	color: #fff;
+}
