@@ -8,6 +8,8 @@ import { Margin } from "./ui/Margin";
 export function PokemonButtons(props: {
 	pokemons: PokemonData[];
 	setPokemons: (pokemons: PokemonData[]) => any;
+	title: string;
+	setTitle: (title: string) => any;
 	pokemonsRef: React.RefObject<HTMLDivElement>;
 }) {
 	const onShuffle = () => {
@@ -33,6 +35,8 @@ export function PokemonButtons(props: {
 			<PokemonDownload
 				pokemons={props.pokemons}
 				setPokemons={props.setPokemons}
+				title={props.title}
+				setTitle={props.setTitle}
 				pokemonsRef={props.pokemonsRef}
 			/>
 		</div>

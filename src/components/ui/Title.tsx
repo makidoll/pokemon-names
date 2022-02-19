@@ -7,7 +7,7 @@ export function Title(props: {
 	className?: string;
 }) {
 	return (
-		<h1
+		<h2
 			className={props.className}
 			style={{
 				fontSize: props.size + "rem",
@@ -15,6 +15,6 @@ export function Title(props: {
 			}}
 		>
 			{props.children}
-		</h1>
+		</h2>
 	);
 }
